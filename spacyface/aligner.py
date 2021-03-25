@@ -25,9 +25,11 @@ from transformers import (
 from .simple_spacy_token import SimpleSpacyToken
 from .utils.f import flatten_, assoc, delegates
 
+
 def doc_to_fixed_tokens(doc: SpacyDoc) -> List[str]:
     """Fix the tokens in a document to not have exceptions"""
     return [fix_token(t) for t in doc]
+
 
 def fix_token(tok: SpacyToken) -> str:
     """Determine whether a token should be represented by its text or its norm
@@ -45,6 +47,7 @@ def fix_token(tok: SpacyToken) -> str:
     out = tok.text if tok.text.lower() == tok.norm_ else tok.norm_
 
     return out
+
 
 def MakeAligner(pretrained_tokenizer, spacy_language_model):
     """Create an aligner from the pretrained tokenizers. Some caveats to note:
@@ -149,7 +152,7 @@ def MakeAligner(pretrained_tokenizer, spacy_language_model):
             For GPT2 tokenization, there is a different behavior for the tokenization of a word if it
             starts the sentence vs if it occurs later in the sentence.
             """
-            BUFFER = "X " # GPT tokenization fusses if it thinks the token is the beginning of the sentence
+            BUFFER = "X "  # GPT tokenization fusses if it thinks the token is the beginning of the sentence
 
             def choose_norm(t):
                 return t['token'] if t['token'].lower() == t['norm'] else t['norm']
@@ -157,13 +160,16 @@ def MakeAligner(pretrained_tokenizer, spacy_language_model):
             tok = choose_norm(meta_token)
 
             if idx != 0:
-                s = BUFFER + tok # Add a buffer with guaranteed tokenization of length 1 to input
+                s = BUFFER + tok  # Add a buffer with guaranteed tokenization of length 1 to input
                 offset = 1
+                # T5 tokenize "X" into 2 tokens! "_" & "X"
+                if isinstance(self, T5Tokenizer):
+                    offset = 2
             else:
                 s = tok
                 offset = 0
 
-            bpe_tokens = super().tokenize(s) # Can't do `self.tokenize` because it will normalize again
+            bpe_tokens = super().tokenize(s)  # Can't do `self.tokenize` because it will normalize again
 
             # Functional version that works with dictionaries
             return [meta_token.assoc("token", b) for b in bpe_tokens[offset:]]
