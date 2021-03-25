@@ -29,7 +29,8 @@ def check_ent(tok: SpacyToken):
     NO_ENT_DEFINED = 0
     return tok.ent_iob != OUT_OF_ENT and tok.ent_iob != NO_ENT_DEFINED
 
-class SimpleSpacyToken():
+
+class SimpleSpacyToken:
     """A wrapper around a Spacy token to extract desired information
 
     This class implements a basic functional dictionary-like wrapper around the spacy token to 
@@ -67,7 +68,7 @@ class SimpleSpacyToken():
         ("is_ent", np.bool_),
     ]
 
-    def __init__(self, t:Union[SpacyToken, str]):
+    def __init__(self, t: Union[SpacyToken, str]):
         """Create a simplified version of a spacy token
         
         Args:
@@ -116,7 +117,7 @@ class SimpleSpacyToken():
         """
         return {k: self[k] for k in keys}
 
-    def assoc(self, key:str, value):
+    def assoc(self, key: str, value):
         """Set the 'key' to the 'value', returning a new instance of this class.
         
         Args:
